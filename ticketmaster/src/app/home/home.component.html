@@ -1,0 +1,79 @@
+<div class="column gap-1">    
+    <!-- Tickets Section -->
+    <p-table [value]="tickets.items"
+            dataKey="ticketId"
+            [expandedRowKeys]="expandedRows"
+            (onRowExpand)="onRowExpand($event)" 
+            (onRowCollapse)="onRowCollapse($event)"
+            responsiveLayout="stack" 
+            [breakpoint]="'960px'"
+            class="table">
+        <ng-template pTemplate="caption" class="table-header">
+            <div class="align-center row wrap gap-2 space-between">
+                Tickets
+                <button pButton icon="pi pi-plus" label="Add Ticket" (click)="toggleAddPopup()" class="add-ticket-btn"></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th></th>
+                <th>Id</th>
+                <th class="w-80">Name</th>
+                <th>Severity</th>
+                <th class="w-20">Status</th>
+                <th class="row justify-end maxw-5">Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ticket let-expanded="expanded">
+            <tr>
+                <td>
+                    <p-button type="button" pRipple [pRowToggler]="ticket" [text]="true" [rounded]="true" [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+                </td>
+                <td><span class="p-column-title">Id</span>#{{ ticket.ticketId }}</td>
+                <td><span class="p-column-title">Name</span>{{ ticket.name }}</td>
+                <td><span class="p-column-title">Severity</span>{{ ticket.severity }}</td>
+                <td><span class="p-column-title">Status</span>{{ ticket.status }}</td>
+                <td>
+                    <app-ticket [ticket]="ticket" (edit)="toggleEditPopup($event)" (delete)="toggleDeletePopup($event)">
+                    </app-ticket>
+                </td>
+                </tr>
+                </ng-template>
+                <ng-template pTemplate="summary">
+            <div class="flex align-center">
+                Total: {{tickets ? tickets.items.length : 0 }} tickets
+            </div>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-ticket>
+            <tr>
+              <td colspan="6">
+                <div class="p-grid p-nogutter">
+                  <div class="p-col-12">
+                    <b>Description:</b>
+                    <p>{{ ticket.description }}</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+    </p-table>
+
+    <!-- Paginator -->
+    <p-paginator [rows]="rows" [totalRecords]="totalRecords" [rowsPerPageOptions]="[20, 50, 100]"
+        (onPageChange)="onPageChange($event)" #paginator>
+    </p-paginator>
+</div>
+
+<!-- Popups -->
+<app-edit-popup *ngIf="displayEditPopup" 
+[ticket]="selectedTicket" 
+(confirm)="onConfirmEdit($event)" 
+[(display)]="displayEditPopup"
+draggable="false"
+header="Edit Ticket"></app-edit-popup>
+
+<app-edit-popup *ngIf="displayAddPopup"
+(confirm)="onConfirmAdd($event)" 
+[(display)]="displayAddPopup"
+draggable="false"
+header="Add Ticket"></app-edit-popup>

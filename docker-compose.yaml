@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  # Angular app service
+  ticketmaster:
+    container_name: ticketmaster_app
+    build:
+      context: ./ticketmaster
+      dockerfile: Dockerfile
+    image: ticketmaster_app:v1  
+    ports:
+      - 80:80
+    depends_on:
+      - server
+    networks:
+      - ticketmaster-network
+
+  # Node api service
+  server:
+    container_name: ticketmaster_api
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    env_file:
+      - ./server/.env  
+    image: ticketmaster_api:v1
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://ticketmaster_db:27017/ticketmaster-db
+      - CORS_ORIGIN=http://localhost:4200,http://localhost
+      - SERVER_PORT=3000
+    depends_on:
+      - mongodb
+    networks:
+      - ticketmaster-network
+
+  # Mongodb service
+  mongodb:
+    image: mongo:latest
+    container_name: ticketmaster_db
+    ports:
+      - 27017:27017
+    restart: always
+    networks:
+      - ticketmaster-network
+    volumes:
+      - mongo_data:/data/db  
+
+networks:
+  ticketmaster-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+
+  

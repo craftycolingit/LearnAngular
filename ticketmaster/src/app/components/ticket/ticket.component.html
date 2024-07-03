@@ -1,0 +1,22 @@
+<div class="row gap-05 justify-end">
+    <button
+        type="button" 
+        pButton 
+        icon="pi pi-pencil" 
+        (click)="editTicket()" 
+        class="edit-button"
+        label="Edit">
+    </button>
+    <button 
+        type="button"
+        pButton 
+        icon="pi pi-trash" 
+        (click)="confirmDelete()" 
+        class="delete-button"
+        label="Delete"
+        class="p-button-danger"
+        #deleteButton>
+    </button>
+</div>
+
+<p-confirmPopup></p-confirmPopup>

@@ -1,0 +1,38 @@
+<p-dialog [header]="header" [(visible)]="display" [modal]="true" [closable]="false">
+
+    <div class="popup-wrapper">
+        <form class="column gap-1 form-wrapper" [formGroup]="ticketForm">
+            <div class="row gap-2 align-center">
+                <span class="label">Name:</span>
+                <input type="text" pInputText formControlName="name" placeholder="New ticket" />
+            </div>
+    
+            <div class="row gap-2">
+                <span class="label">Description:</span>
+                <textarea rows="5" cols="30" pInputTextarea formControlName="description" placeholder="Enter ticket information..."></textarea>
+            </div>
+    
+            <div class="row gap-2 align-center">
+                <span class="label">Severity:</span>
+                <input type="number" max="5" min="1" pInputText formControlName="severity" />
+                </div>
+                
+                <div class="row gap-2 align-center">
+                    <span class="label">Status:</span>                
+                    <select formControlName="status" pInputText style="appearance: menulist">
+                        <option *ngFor="let status of statusOptions" [ngValue]="status.label">
+                            {{ status.value }}
+                        </option>
+                    </select>
+                </div>
+                </form>
+                </div>
+
+    <div class="popup-footer">
+        <p-footer class="row gap-05">
+            <button type="button" pButton icon="pi pi-check" (click)="onConfirm()" label="Confirm" [class.disabled]="!ticketForm.valid"></button>
+            <button type="button" pButton icon="pi pi-times" (click)="onCancel()" label="Cancel"></button>
+        </p-footer>
+    </div>
+
+</p-dialog>

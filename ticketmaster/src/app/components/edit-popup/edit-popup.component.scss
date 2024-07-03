@@ -1,0 +1,34 @@
+.form-wrapper {
+    .row {
+        span {
+            flex: 1;
+        }
+
+        input {
+            flex: 3;
+        }
+    }
+
+    .rating {
+        margin-top: 0.5rem;
+    }
+}
+
+.popup-wrapper {
+    position: relative;
+    padding: 1rem;
+    overflow: visible;
+  }
+  
+  .popup-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    position: relative;
+    z-index: 1000;
+  }
+  
+  :host ::ng-deep .p-dropdown-panel {
+    z-index: 1050 !important; 
+    overflow: visible;
+  }
