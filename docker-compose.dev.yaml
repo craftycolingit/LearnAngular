@@ -1,58 +1,67 @@
 services:
-  # Production Angular app service
-  ticketmaster:
-    container_name: ticketmaster_app
+  # Development Angular app service
+  ticketmaster_dev:
+    container_name: ticketmaster_app_dev
     build:
       context: ./ticketmaster
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       args:
-        - configuration=production
-    image: ticketmaster_app:v1  
+        - configuration=development
+    image: ticketmaster_app_dev:v1  
     ports:
-      - 80:80
+      - 4200:4200
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./ticketmaster:/app
+      - /app/node_modules
+    command: ng serve --host 0.0.0.0 --poll=2000
     depends_on:
-      - server
-      - elasticsearch
+      - server_dev
+      - elasticsearch_dev
     networks:
-      - ticketmaster-network
+      - ticketmaster-network-dev  
 
-  # Production Node API service
-  server:
-    container_name: ticketmaster_api
+  # Development Node API service
+  server_dev:
+    container_name: ticketmaster_api_dev
     build:
       context: ./server
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     env_file:
-      - ./server/.env  
-    image: ticketmaster_api:v1
+      - ./server/.env
+    image: ticketmaster_api_dev:v1
     ports:
       - 3000:3000
     environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://ticketmaster_db:27017/ticketmaster-db
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://ticketmaster_db_dev:27017/ticketmaster-db-dev
       - CORS_ORIGIN=http://localhost:4200,http://localhost
       - SERVER_PORT=3000
+    volumes:
+      - ./server:/usr/local/api
+    command: npm run dev
     depends_on:
-      - mongodb      
+      - mongodb_dev      
     networks:
-      - ticketmaster-network
+      - ticketmaster-network-dev
 
   # Mongodb service
-  mongodb:
+  mongodb_dev:
     image: mongo:latest
-    container_name: ticketmaster_db
+    container_name: ticketmaster_db_dev
     ports:
       - 27017:27017
     restart: always
     networks:
-      - ticketmaster-network
+      - ticketmaster-network-dev
     volumes:
       - mongo_data:/data/db  
 
   # Elasticsearch service
-  elasticsearch:
+  elasticsearch_dev:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.14.1
-    container_name: ticketmaster_elasticsearch
+    container_name: ticketmaster_elasticsearch_dev
     environment: [
       'CLI_JAVA_OPTS=-Xms2g -Xmx2g',
       'bootstrap.memory_lock=true',
@@ -76,18 +85,18 @@ services:
           reservations:
             cpus: '1.0'
     networks:
-      - ticketmaster-network
+      - ticketmaster-network-dev
 
   # Kibana service
-  kibana:
+  kibana_dev:
     image: docker.elastic.co/kibana/kibana:8.14.1
-    container_name: ticketmaster_kibana
+    container_name: ticketmaster_kibana_dev
     environment:
       XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
     ports:
       - 5601:5601
     networks:
-      - ticketmaster-network
+      - ticketmaster-network-dev
     deploy:    
       resources:
           limits:
@@ -96,10 +105,11 @@ services:
             cpus: '1.0'
 
 networks:
-  ticketmaster-network:
+  ticketmaster-network-dev:
     driver: bridge
 
 volumes:
   mongo_data:
+  node_modules: {}
 
   
