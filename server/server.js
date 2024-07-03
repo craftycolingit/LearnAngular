@@ -35,7 +35,7 @@ const mongoURI = process.env.NODE_ENV === 'production'
   : process.env.MONGODB_URI_DEV;
 
 // Connect to MongoDB
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoURI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Connection error', err));
 

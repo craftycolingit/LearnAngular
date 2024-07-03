@@ -10,7 +10,7 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { BadgeModule } from 'primeng/badge';
 import { DialogModule } from 'primeng/dialog';
-import { environment } from '../../environments/environment.dev';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-home',

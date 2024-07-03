@@ -15,8 +15,10 @@ RUN npx ngcc --properties es2015 browser module main --first-only --create-ivy-e
 # Copy the rest of the application code
 COPY . .
 
+ARG configuration=production
+
 # Build the Angular app
-RUN npm run build
+RUN npm run build -- --configuration=$configuration
 
 # Stage 2: Serve the Angular app
 # Get the official Nginx image

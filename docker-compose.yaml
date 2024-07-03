@@ -7,6 +7,8 @@ services:
     build:
       context: ./ticketmaster
       dockerfile: Dockerfile
+      args:
+        - configuration=production
     image: ticketmaster_app:v1  
     ports:
       - 80:80
