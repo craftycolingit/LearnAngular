@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@elastic/elasticsearch": "8.14",
+    "@elastic/transport": "^8.7.0"
+  }
+}

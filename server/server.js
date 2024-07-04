@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 // Import routes
-const routes = require('./routes');
+const routes = require('./api/routes');
 
 const app = express();
 
@@ -47,6 +47,7 @@ app.use(express.json());
 
 // Use the imported routes
 app.use('/api', routes);
+
 
 app.listen(process.env.SERVER_PORT, () => {
   console.log(`Server listening at ${process.env.SERVER_PORT}`);

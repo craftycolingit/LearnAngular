@@ -60,7 +60,7 @@ services:
 
   # Elasticsearch service
   elasticsearch_dev:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.0
     container_name: ticketmaster_elasticsearch_dev
     environment: [
       'CLI_JAVA_OPTS=-Xms2g -Xmx2g',
@@ -89,7 +89,7 @@ services:
 
   # Kibana service
   kibana_dev:
-    image: docker.elastic.co/kibana/kibana:8.14.1
+    image: docker.elastic.co/kibana/kibana:8.14.0
     container_name: ticketmaster_kibana_dev
     environment:
       XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
