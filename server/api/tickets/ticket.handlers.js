@@ -1,6 +1,6 @@
 const Ticket = require('../../models/Ticket');
 
-// Get all tickets
+// Get tickets by page and perPage
 exports.getTickets = async function(req, res) {
   try {
     const page = parseInt(req.query.page) || 0;
