@@ -1,17 +1,15 @@
 const esClient = require('../../elastic-client');
 const Ticket = require('../../models/Ticket');
-const ticketHandlers = require('../tickets/ticket.handlers');
 
 // create the index
-exports.createTicketIndex = async function(req, res) {
-
-console.log(req.params);
-
+exports.createIndex = async function(req, res) {
   try {
+
+    const { indexName, mappings } = req.body;
 
     // if index already exists return 'already exists'
     const exists = await esClient.indices.exists({
-        index: 'tickets_dev'
+        index: indexName
     });
 
     if (exists.body) {
@@ -19,20 +17,9 @@ console.log(req.params);
     }
 
     await esClient.indices.create({
-      index: 'tickets_dev',
+      index: indexName,
       body: {
-        mappings: {
-          properties: {
-            _mongoId: { type: 'keyword' },
-            ticketId: { type: 'integer' },
-            name: { type: 'text' },
-            description: { type: 'text' },
-            severity: { type: 'integer' },
-            status: { type: 'keyword' },
-            createdAt: { type: 'date' },
-            updatedAt: { type: 'date' }
-          }
-        }
+        mappings
       }
     });
 
@@ -45,35 +32,42 @@ console.log(req.params);
 }
 
 
-// Get all tickets from elastic search
-exports.getTickets = async function(req, res) {
+// Get all documents from elastic search
+exports.getDocuments = async function(req, res) {
   try {
-    const page = parseInt(req.query.page) || 0;
-    const perPage = parseInt(req.query.perPage) || 20;
 
-    const { body } = await esClient.search({
-      index: 'tickets_dev',
+    const { indexName, page = 0, perPage = 20 } = req.query;
+
+    const response = await esClient.search({
+      index: indexName,
       from: page * perPage,
       size: perPage,
+      body: {
+        query: {
+          match_all: {}
+        }
+      }
     });
 
-    res.json({
-      items: body.hits.hits.map(hit => hit._source),
-      total: body.hits.total.value,
+    return res.status(200).json({
+      items: response.hits.hits.map(hit => hit._source),
+      total: response.hits.total.value,
       page: page,
       perPage: perPage,
-      totalPages: Math.ceil(body.hits.total.value / perPage)
+      totalPages: Math.ceil(response.hits.total.value / perPage)
     });
 
   } catch (error) {
     console.error(error);
-    res.status(500).send("Unable to get tickets.");
+    res.status(500).send("Unable to get documents.");
   }
 }
 
 // update the index with data from mongodb
-exports.updateIndex = async function(_, res) {
+exports.updateIndex = async function(req, res) {
     try {
+       const { indexName } = req.body;
+
         // Fetch all tickets from the MongoDB database
         const tickets = await Ticket.find();
         
@@ -84,7 +78,7 @@ exports.updateIndex = async function(_, res) {
 
         // Create the operations array for bulk indexing
         const operations = tickets.flatMap(ticket => [
-            { index: { _index: 'tickets_dev', _id: ticket._id.toString() } }, // Use MongoDB _id as the document ID in Elasticsearch
+            { index: { _index: indexName, _id: ticket._id.toString() } }, // Use MongoDB _id as the document ID in Elasticsearch
             {
                 ticketId: ticket.ticketId,
                 name: ticket.name,
