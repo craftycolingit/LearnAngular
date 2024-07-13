@@ -112,10 +112,10 @@ export class HomeComponent {
 
   fetchTickets(page: number, perPage: number) {
 
-    const indexName = 'tickets_dev';
+    const indexName = 'tickets_dev_new';
 
     this.ticketsService
-      .getTickets(`${this.server}/api/elasticsearch/search`, { indexName, page, perPage })
+      .getTickets(`${this.server}/api/elasticsearch/fetch-all`, { indexName, page, perPage })
       .subscribe({
         next: (data: Tickets) => {
           this.tickets = data;

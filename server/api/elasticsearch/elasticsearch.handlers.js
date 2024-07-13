@@ -31,9 +31,44 @@ exports.createIndex = async function(req, res) {
   }
 }
 
+// search documents by query
+exports.searchDocuments = async function (req, res) {
+  try {
+    const { indexName, query, page = 0, perPage = 20 } = req.query;
+
+    const searchQuery = {
+      index: indexName,
+      from: page * perPage,
+      size: perPage,
+      body: {
+        query: {
+          multi_match: {
+            query: query,
+            type: "bool_prefix",
+            fields: ["name", "name._2gram", "name._3gram"],
+          },
+        },
+      } 
+    }
+
+    const response = await esClient.search(searchQuery);
+
+    return res.status(200).json({
+      items: response.hits.hits.map(hit => hit._source),
+      total: response.hits.total.value,
+      page: page,
+      perPage: perPage,
+      totalPages: Math.ceil(response.hits.total.value / perPage)
+    });   
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Unable to get documents.");
+  }
+}
 
 // Get all documents from elastic search
-exports.getDocuments = async function(req, res) {
+exports.fetchAllDocuments = async function(req, res) {
   try {
 
     const { indexName, page = 0, perPage = 20 } = req.query;
