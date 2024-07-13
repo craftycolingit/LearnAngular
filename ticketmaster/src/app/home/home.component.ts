@@ -111,8 +111,11 @@ export class HomeComponent {
   }
 
   fetchTickets(page: number, perPage: number) {
+
+    const indexName = 'tickets_dev';
+
     this.ticketsService
-      .getTickets(`${this.server}/api/tickets`, { page, perPage })
+      .getTickets(`${this.server}/api/elasticsearch/search`, { indexName, page, perPage })
       .subscribe({
         next: (data: Tickets) => {
           this.tickets = data;
@@ -157,9 +160,6 @@ export class HomeComponent {
 
   // Add a new ticket
   addTicket(ticket: Ticket) {
-
-    console.log(ticket, 'addTicket');
-
     const newTicket = {
       name: ticket.name,
       description: ticket.description,
