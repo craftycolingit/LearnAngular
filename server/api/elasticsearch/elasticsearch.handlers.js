@@ -78,6 +78,9 @@ exports.fetchAllDocuments = async function(req, res) {
       from: page * perPage,
       size: perPage,
       body: {
+        sort: [
+          { ticketId: { order: "asc" } } // Ensure sorting by ticketId in ascending order
+        ],
         query: {
           match_all: {}
         }
@@ -85,7 +88,10 @@ exports.fetchAllDocuments = async function(req, res) {
     });
 
     return res.status(200).json({
-      items: response.hits.hits.map(hit => hit._source),
+      items: response.hits.hits.map(hit => ({
+        ...hit._source,
+      _id: hit._id
+    })),
       total: response.hits.total.value,
       page: page,
       perPage: perPage,
@@ -113,7 +119,12 @@ exports.updateIndex = async function(req, res) {
 
         // Create the operations array for bulk indexing
         const operations = tickets.flatMap(ticket => [
-            { index: { _index: indexName, _id: ticket._id.toString() } }, // Use MongoDB _id as the document ID in Elasticsearch
+            { index: 
+              { 
+                _index: indexName, 
+                _id: ticket._id.toString() 
+              } 
+            }, // Use MongoDB _id as the document ID in Elasticsearch
             {
                 ticketId: ticket.ticketId,
                 name: ticket.name,
@@ -171,3 +182,29 @@ exports.addDocument = async function(indexName, newDocument) {
     throw new Error("Unable to add document."); // Throw error to be caught in the calling function
   }
 };
+
+// update a document in elastic search
+exports.updateDocument = async function(indexName, updatedDocument) { 
+  try {
+
+    console.log(indexName, updatedDocument);
+
+    const response = await esClient.update({
+      index: indexName,
+      id: updatedDocument._id.toString(),
+      body: { doc: {
+        name: updatedDocument.name,
+        description: updatedDocument.description,
+        severity: updatedDocument.severity,
+        status: updatedDocument.status,
+        updatedAt: updatedDocument.updatedAt
+    }} 
+    });
+
+    console.log("Document updated in Elasticsearch");
+    return response;
+  } catch (error) {
+    console.error('Error updating document in Elasticsearch:', error);
+    throw new Error("Unable to update document."); // Throw error to be caught in the calling function
+  }
+}

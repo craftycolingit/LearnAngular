@@ -1,5 +1,5 @@
 const Ticket = require('../../models/Ticket');
-const { addDocument } = require('../elasticsearch/elasticsearch.handlers');
+const { addDocument, updateDocument } = require('../elasticsearch/elasticsearch.handlers');
 
 // Get tickets by page and perPage
 exports.getTickets = async function(req, res) {
@@ -76,8 +76,21 @@ exports.addTicket = async function (req, res) {
 
 // Edit a ticket
 exports.updateTicket = async function(req, res) {
+
+  const { indexName, ticket } = req.body;
+
   try {
-    const ticket = await Ticket.findByIdAndUpdate(req.body._id, req.body, { new: true });
+    // check if the ticket exists
+    const ticketExists = await Ticket.findById(req.params._id);
+    if (!ticketExists) {
+      return res.status(404).send('Ticket not found');
+    }
+
+    const updatedTicket = await Ticket.updateOne({ _id: req.params._id }, ticket);
+
+    if (updatedTicket.acknowledged && updatedTicket.modifiedCount > 0) { 
+       await updateDocument(indexName, ticket);
+    }
     res.status(200).json(ticket);
   }
   catch (err) {

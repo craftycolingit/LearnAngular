@@ -85,6 +85,9 @@ export class EditPopupComponent {
 
   onConfirm() {
     const { _id, ticketId, name, description, severity, status } = this.ticketForm.value;
+
+    console.log(_id);
+
     if (this.ticketForm.valid) {
       this.confirm.emit({
         _id: _id || '',

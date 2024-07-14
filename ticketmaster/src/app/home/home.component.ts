@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { TicketsService } from '../services/tickets/tickets.service';
 import { Tickets, Ticket } from '../../types';
 import { TicketComponent } from '../components/ticket/ticket.component';
@@ -28,10 +28,10 @@ import { environment } from '../../environments/environment';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit{
   private readonly server: string = environment.API_BASE_URL;
   private readonly indexName: string = environment.elastic_index;
-  constructor(private ticketsService: TicketsService) {}
+  constructor(private ticketsService: TicketsService, private changeDetectorRef: ChangeDetectorRef) {}
 
   @ViewChild('paginator') paginator: Paginator | undefined;
 
@@ -119,6 +119,9 @@ export class HomeComponent {
       .getTickets(`${this.server}/api/elasticsearch/fetch-all`, { indexName, page, perPage })
       .subscribe({
         next: (data: Tickets) => {
+
+          console.log(data);
+
           this.tickets = data;
           this.totalRecords = data.total;
         },
@@ -133,10 +136,23 @@ export class HomeComponent {
       return;
     }
 
+    const request = {
+      indexName: this.indexName,
+      ticket: ticket
+    };
+
     this.ticketsService
-      .editTicket(`${this.server}/api/tickets/${_id}`, ticket)
+      .editTicket(`${this.server}/api/tickets/${_id}`, request)
       .subscribe({
-        next: (data) => {
+        next: (updatedTicket) => {
+          // const index = this.tickets.items.findIndex((t) => t._id === _id);
+
+          // if (index !== -1) { 
+          //   this.tickets.items[index] = updatedTicket;
+          // }
+
+          //this.changeDetectorRef.detectChanges();
+
           this.fetchTickets(0, this.rows);
           this.resetPaginator();
         },
