@@ -30,6 +30,7 @@ import { environment } from '../../environments/environment';
 })
 export class HomeComponent {
   private readonly server: string = environment.API_BASE_URL;
+  private readonly indexName: string = environment.elastic_index;
   constructor(private ticketsService: TicketsService) {}
 
   @ViewChild('paginator') paginator: Paginator | undefined;
@@ -112,7 +113,7 @@ export class HomeComponent {
 
   fetchTickets(page: number, perPage: number) {
 
-    const indexName = 'tickets_dev_new';
+    const indexName = this.indexName;
 
     this.ticketsService
       .getTickets(`${this.server}/api/elasticsearch/fetch-all`, { indexName, page, perPage })
@@ -161,10 +162,13 @@ export class HomeComponent {
   // Add a new ticket
   addTicket(ticket: Ticket) {
     const newTicket = {
-      name: ticket.name,
-      description: ticket.description,
-      severity: ticket.severity,
-      status: ticket.status,
+      indexName: this.indexName,
+      ticket: {
+        name: ticket.name,
+        description: ticket.description,
+        severity: ticket.severity,
+        status: ticket.status,
+      }      
     };
 
     this.ticketsService

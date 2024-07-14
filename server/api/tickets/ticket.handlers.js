@@ -1,4 +1,5 @@
 const Ticket = require('../../models/Ticket');
+const { addDocument } = require('../elasticsearch/elasticsearch.handlers');
 
 // Get tickets by page and perPage
 exports.getTickets = async function(req, res) {
@@ -41,15 +42,32 @@ exports.getTicket = async (req, res) => {
 // Add a new ticket
 exports.addTicket = async function (req, res) {
   try {
+    const {indexName, ticket} = req.body;
+
     // get the last ticketId
-    const lastTicket = await Ticket.findOne().sort({ ticketId: -1 });
+    const lastTicket = await Ticket.findOne().sort({ ticketId: -1 });    
 
     // increment the ticketId
-    req.body.ticketId = lastTicket ? lastTicket.ticketId + 1 : 1;
+    ticket.ticketId = lastTicket ? lastTicket.ticketId + 1 : 1;
 
-    const newTicket = new Ticket(req.body);
+    const newTicket = new Ticket({
+      name: ticket.name,
+      description: ticket.description,
+      ticketId: ticket.ticketId,
+      severity: ticket.severity,
+      status: ticket.status,
+    });
 
     await newTicket.save();
+
+    // if successful then update elastic search
+    if (res.status(201)) {
+      // get the recently created ticket from the database (because we need the new _id)
+      const newDocument = await Ticket.findOne({ ticketId: ticket.ticketId });      
+
+      await addDocument(indexName, newDocument);
+    }
+
     res.status(201).json(newTicket);
   } catch (err) {
     res.status(500).send(err);

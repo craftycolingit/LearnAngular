@@ -146,3 +146,28 @@ exports.updateIndex = async function(req, res) {
         res.status(500).send("Unable to get tickets.");  
     }
 };
+
+// add a new document to elastic search
+exports.addDocument = async function(indexName, newDocument) {
+  try {
+    const response = await esClient.index({
+      index: indexName, 
+      id: newDocument._id.toString(),
+      body: {
+        ticketId: newDocument.ticketId,
+        name: newDocument.name,
+        description: newDocument.description,
+        severity: newDocument.severity,
+        status: newDocument.status,
+        createdAt: newDocument.createdAt,
+        updatedAt: newDocument.updatedAt,
+      },
+    });
+
+    console.log("Document added to Elasticsearch");
+    return response;
+  } catch (error) {
+    console.error('Error adding document to Elasticsearch:', error);
+    throw new Error("Unable to add document."); // Throw error to be caught in the calling function
+  }
+};
