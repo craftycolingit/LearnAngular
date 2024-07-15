@@ -28,7 +28,7 @@ export class ApiService {
       responseType: options?.responseType
     });
   }
-
+  
   post<T>(url:string, body: Ticket, options: Options): Observable<T> {
     return this.httpClient.post<T>(url, body, options) as Observable<T>;
   }
@@ -37,7 +37,7 @@ export class ApiService {
     return this.httpClient.put<T>(url, body, options) as Observable<T>;
   }
 
-  delete<T>(url:string, options: Options): Observable<T> {
-    return this.httpClient.delete<T>(url, options) as Observable<T>;
+  delete<T>(url:string, body: string): Observable<T> {
+    return this.httpClient.delete<T>(url, { body: body }) as Observable<T>;
   }
 }

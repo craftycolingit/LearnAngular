@@ -34,7 +34,7 @@ exports.createIndex = async function(req, res) {
 // search documents by query
 exports.searchDocuments = async function (req, res) {
   try {
-    const { indexName, query, page = 0, perPage = 20 } = req.query;
+    const { indexName, page = 0, perPage = 20, query } = req.query;
 
     const searchQuery = {
       index: indexName,
@@ -137,6 +137,16 @@ exports.updateIndex = async function(req, res) {
             }
         ]);
 
+        // delete all documents from the index
+        await esClient.deleteByQuery({
+            index: indexName,
+            body: {
+                query: {
+                    match_all: {}
+                }
+            }
+        });
+
         // Perform the bulk indexing operation
         const bulkResponse = await esClient.bulk({
             refresh: true,
@@ -204,5 +214,24 @@ exports.updateDocument = async function(indexName, updatedDocument) {
   } catch (error) {
     console.error('Error updating document in Elasticsearch:', error);
     throw new Error("Unable to update document."); // Throw error to be caught in the calling function
+  }
+}
+
+// delete a document from elastic search
+exports.deleteDocument = async function(indexName, documentId) {
+
+  try {
+    const response = await esClient.delete({
+      index: indexName,
+      id: documentId
+    });
+
+    // Refresh the index
+    await esClient.indices.refresh({ index: indexName });
+
+    return response;
+  } catch (error) {
+    console.error('Error deleting document from Elasticsearch:', error);
+    throw new Error("Unable to delete document."); // Throw error to be caught in the calling function
   }
 }

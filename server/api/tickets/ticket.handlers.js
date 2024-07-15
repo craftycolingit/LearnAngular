@@ -1,5 +1,5 @@
 const Ticket = require('../../models/Ticket');
-const { addDocument, updateDocument } = require('../elasticsearch/elasticsearch.handlers');
+const { addDocument, updateDocument, deleteDocument } = require('../elasticsearch/elasticsearch.handlers');
 
 // Get tickets by page and perPage
 exports.getTickets = async function(req, res) {
@@ -100,12 +100,22 @@ exports.updateTicket = async function(req, res) {
 
 // Delete a product
 exports.deleteTicket = async function(req, res) {
+
+  const { indexName } = req.body;
+
   try {
-    const ticket = await Ticket.findByIdAndDelete(req.params._id);
-    if (!ticket) {
+    const ticketExists = await Ticket.findById(req.params._id);
+    if (!ticketExists) {
       return res.status(404).send('Ticket not found');
     }
-    res.send(ticket);
+
+    const response = await Ticket.deleteOne({ _id: req.params._id });
+
+    if (response.acknowledged && response.deletedCount === 1) {
+      await deleteDocument(indexName, req.params._id);
+    }
+
+    res.status(204).send();
   } catch (err) {
     res.status(500).send(err);
   }

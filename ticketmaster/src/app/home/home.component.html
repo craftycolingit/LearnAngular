@@ -1,3 +1,5 @@
+<input type="text" placeholder="Search tickets..." (input)="onSearch($event)" class="search-bar"/>
+
 <div class="column gap-1">    
     <!-- Tickets Section -->
     <p-table [value]="tickets.items"

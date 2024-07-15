@@ -11,3 +11,15 @@
     width: 100%;
     border-collapse: collapse;
 }
+
+.search-bar {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+
+    &:focus {
+        outline-color: #007bff;
+    }
+}

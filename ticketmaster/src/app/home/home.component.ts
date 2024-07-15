@@ -11,6 +11,7 @@ import { TableModule } from 'primeng/table';
 import { BadgeModule } from 'primeng/badge';
 import { DialogModule } from 'primeng/dialog';
 import { environment } from '../../environments/environment';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -42,6 +43,7 @@ export class HomeComponent implements OnInit{
   totalRecords: number = 0;
   rows: number = 20;
   expandedRows: { [key: string]: boolean } = {};
+  searchTerms = new Subject<string>();
 
   toggleRow(ticket: Ticket) {
     const ticketIdStr = String(ticket.ticketId);
@@ -111,6 +113,11 @@ export class HomeComponent implements OnInit{
     this.paginator?.changePage(0);
   }
 
+  onSearch(event: any): void {
+    const term = event.target.value.trim();
+    this.searchTerms.next(term);
+  }
+
   fetchTickets(page: number, perPage: number) {
 
     const indexName = this.indexName;
@@ -152,8 +159,16 @@ export class HomeComponent implements OnInit{
   }
 
   deleteTicket(_id: string) {
+    if (!_id) {
+      return;
+    }
+
+    const request = {
+      indexName: this.indexName
+    };
+
     this.ticketsService
-      .deleteTicket(`${this.server}/api/tickets/${_id}`)
+      .deleteTicket(`${this.server}/api/tickets/${_id}`, request)
       .subscribe({
         next: (data) => {
           this.fetchTickets(0, this.rows);
@@ -188,7 +203,32 @@ export class HomeComponent implements OnInit{
       });
   }
 
+  searchTickets(page: number, perPage: number, query: string = '') {
+
+    if (!query) {
+      this.fetchTickets(0, this.rows);
+      return;
+    }
+
+    const indexName = this.indexName;
+    this.ticketsService
+      .searchTickets(`${this.server}/api/elasticsearch/search`, { indexName, page, perPage, query })
+      .subscribe({
+        next: (data: Tickets) => {
+          this.tickets = {...data, items: [...data.items]};
+          this.totalRecords = data.total;
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
+  }
+
   ngOnInit() {
     this.fetchTickets(0, this.rows);
+    this.searchTerms.pipe(
+      debounceTime(200),        // wait 200ms after each keystroke before considering the term
+      distinctUntilChanged()    // ignore new term if same as previous term
+    ).subscribe(term => this.searchTickets(0, this.rows, term));
   }
 }

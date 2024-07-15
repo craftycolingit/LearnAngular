@@ -40,3 +40,11 @@ export interface PaginationParams {
     perPage: number;
 }
 
+export interface SearchParams { 
+    [params: string]: string | number | boolean | ReadonlyArray<string | number | boolean>;
+    indexName: string;
+    query: string;
+    page: number;
+    perPage: number;
+}
+
