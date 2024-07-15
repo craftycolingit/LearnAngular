@@ -84,7 +84,8 @@ exports.fetchAllDocuments = async function(req, res) {
         query: {
           match_all: {}
         }
-      }
+      },
+      request_cache: false
     });
 
     return res.status(200).json({
@@ -174,8 +175,6 @@ exports.addDocument = async function(indexName, newDocument) {
         updatedAt: newDocument.updatedAt,
       },
     });
-
-    console.log("Document added to Elasticsearch");
     return response;
   } catch (error) {
     console.error('Error adding document to Elasticsearch:', error);
@@ -186,9 +185,6 @@ exports.addDocument = async function(indexName, newDocument) {
 // update a document in elastic search
 exports.updateDocument = async function(indexName, updatedDocument) { 
   try {
-
-    console.log(indexName, updatedDocument);
-
     const response = await esClient.update({
       index: indexName,
       id: updatedDocument._id.toString(),
@@ -201,7 +197,9 @@ exports.updateDocument = async function(indexName, updatedDocument) {
     }} 
     });
 
-    console.log("Document updated in Elasticsearch");
+    // Refresh the index
+    await esClient.indices.refresh({ index: indexName });
+
     return response;
   } catch (error) {
     console.error('Error updating document in Elasticsearch:', error);
