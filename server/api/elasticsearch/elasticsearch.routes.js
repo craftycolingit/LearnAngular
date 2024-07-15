@@ -1,6 +1,5 @@
 const express = require("express");
 const elasticsearchRoutes = express.Router();
-//elasticsearchRoutes.use(express.json());
 
 // Import the handlers
 const elasticsearchHandlers = require("./elasticsearch.handlers");

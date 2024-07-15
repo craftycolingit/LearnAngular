@@ -41,7 +41,4 @@ export class TicketComponent {
   deleteTicket() {
     this.delete.emit(this.ticket);
   }
-
-  ngOnInit() {
-  }
 }

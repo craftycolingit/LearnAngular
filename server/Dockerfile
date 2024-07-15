@@ -1,5 +1,5 @@
 # Get the official Node.js image
-FROM node:alpine as build
+FROM node:alpine AS build
 
 # Set the working directory inside the container
 WORKDIR /usr/local/api

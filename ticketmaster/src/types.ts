@@ -1,5 +1,7 @@
 import { HttpContext, HttpHeaders, HttpParams } from "@angular/common/http";
 
+type PrimitiveOrReadonlyArray = string | number | boolean | ReadonlyArray<string | number | boolean>;
+
 export interface Options {  
     headers?: HttpHeaders | {
         [header: string]: string | string[];
@@ -7,7 +9,7 @@ export interface Options {
     observe?: 'body';
     context?: HttpContext;
     params?: HttpParams | {
-        [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean>;
+        [param: string]: PrimitiveOrReadonlyArray;
     };
     reportProgress?: boolean;
     responseType?: 'json';
@@ -35,13 +37,13 @@ export interface Ticket {
 }
 
 export interface PaginationParams {
-    [params: string]: string | number | boolean | ReadonlyArray<string | number | boolean>;
+    [params: string]: PrimitiveOrReadonlyArray;
     page: number;
     perPage: number;
 }
 
 export interface SearchParams { 
-    [params: string]: string | number | boolean | ReadonlyArray<string | number | boolean>;
+    [params: string]: PrimitiveOrReadonlyArray;
     indexName: string;
     query: string;
     page: number;

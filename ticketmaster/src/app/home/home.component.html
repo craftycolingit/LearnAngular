@@ -20,12 +20,12 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th></th>
-                <th pSortableColumn="ticketId">Id</th>
-                <th class="w-80">Name</th>
-                <th>Severity</th>
-                <th class="w-20">Status</th>
-                <th class="row justify-end maxw-5">Actions</th>
+                <th scope="col"></th>
+                <th scope="col" pSortableColumn="ticketId">Id</th>
+                <th scope="col" class="w-80">Name</th>
+                <th scope="col">Severity</th>
+                <th scope="col" class="w-20">Status</th>
+                <th scope="col" class="row justify-end maxw-5">Actions</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-ticket let-expanded="expanded">

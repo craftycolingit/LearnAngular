@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { Ticket } from '../../../types';
 import { FormBuilder, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
@@ -48,7 +48,7 @@ export class EditPopupComponent {
 
   specialCharacterValidator(): ValidatorFn {
     return (control) => {
-      const hasSpecialCharacter = /[@#$%^*_+\=\[\]{};:"\\|<>\/?]+/.test(
+      const hasSpecialCharacter = /[@#$%^*_+=[\]{};:"\\|<>/?]+/.test(
         control.value
       );
       return hasSpecialCharacter ? { hasSpecialCharacter: true } : null;

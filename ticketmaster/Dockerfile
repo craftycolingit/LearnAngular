@@ -18,11 +18,11 @@ COPY . .
 ARG configuration=production
 
 # Build the Angular app
-RUN npm run build -- --configuration=$configuration
+RUN npm run build -- --configuration="$configuration"
 
 # Stage 2: Serve the Angular app
 # Get the official Nginx image
-FROM nginx:latest
+FROM nginx:alpine
 
 # Copy the Nginx configuration file
 COPY nginx.conf /etc/nginx/conf.d/default.conf
